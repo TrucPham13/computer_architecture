@@ -1,6 +1,6 @@
 module lsu (
     input  logic        i_clk,        // Clock
-    input  logic        i_reset,      // Active-high reset
+    input  logic        i_rst_n,      // Active-low reset
     input  logic        i_lsu_wren,   // Write enable (store)
     input  logic [31:0] i_lsu_addr,   // Address for memory or peripheral
     input  logic [31:0] i_st_data,    // Data to store
@@ -22,27 +22,27 @@ module lsu (
     output logic [31:0] o_io_lcd      // LCD register output
 );
 
-    // === Địa chỉ offset (dùng cho input/output buffer) ===
+    // === Offset address for peripherals ===
     logic [15:0] offset_addr;
     assign offset_addr = i_lsu_addr[15:0];
 
-    // === Enable vùng truy cập ===
+    // === Region enables ===
     logic mem_en, sw_en, btn_en, led_en, hex_lo_en, hex_hi_en, lcd_en;
 
     assign mem_en     = (i_lsu_addr >= 32'h0000_0000 && i_lsu_addr <= 32'h0000_07FF);
     assign sw_en      = (i_lsu_addr >= 32'h1001_0000 && i_lsu_addr <= 32'h1001_0FFF);
-    assign btn_en     = (offset_addr == 16'h0004);  // nút nhấn tại địa chỉ cụ thể
+    assign btn_en     = (offset_addr == 16'h0004);
     assign led_en     = (i_lsu_addr >= 32'h1000_0000 && i_lsu_addr <= 32'h1000_1FFF);
     assign hex_lo_en  = (i_lsu_addr >= 32'h1000_2000 && i_lsu_addr <= 32'h1000_2FFF);
     assign hex_hi_en  = (i_lsu_addr >= 32'h1000_3000 && i_lsu_addr <= 32'h1000_3FFF);
     assign lcd_en     = (i_lsu_addr >= 32'h1000_4000 && i_lsu_addr <= 32'h1000_4FFF);
 
-    // === Tín hiệu enable ghi bộ nhớ hoặc ngoại vi ===
+    // === Write enables ===
     logic mem_wren, outbuf_wren;
     assign mem_wren     = mem_en & i_lsu_wren;
     assign outbuf_wren  = (led_en | hex_lo_en | hex_hi_en | lcd_en) & i_lsu_wren;
 
-    // === Chọn dữ liệu đọc từ bộ nhớ/ngoại vi ===
+    // === Load data multiplexer ===
     logic [31:0] mem_rdata, inbuf_data, outbuf_data, selected_data;
     always_comb begin
         case (1'b1)
@@ -57,7 +57,7 @@ module lsu (
         endcase
     end
 
-    // === Load: xử lý theo kiểu LB, LH, LBU, LHU, LW ===
+    // === Load operation (LB, LH, LW, LBU, LHU) ===
     always_comb begin
         case (i_lsu_op)
             3'b000: o_ld_data = {{24{selected_data[7]}}, selected_data[7:0]};     // LB
@@ -69,7 +69,7 @@ module lsu (
         endcase
     end
 
-    // === Store: xử lý dữ liệu ghi theo kiểu SB, SH, SW ===
+    // === Store operation (SB, SH, SW) ===
     logic [31:0] store_data;
     always_comb begin
         case (i_lsu_op)
@@ -80,31 +80,31 @@ module lsu (
         endcase
     end
 
-    // === Bộ nhớ dữ liệu 2KB (dùng cho vùng 0x0000_0000 – 0x0000_07FF) ===
+    // === Memory: 2KB main RAM ===
     memory dmem (
         .i_clk(i_clk),
-        .i_reset(i_reset),
-        .i_addr(i_lsu_addr[10:0]),       // 2KB = 2^11 = 2048 dòng -> 11 bit
+        .i_rst_n(i_rst_n),
+        .i_addr(i_lsu_addr[10:0]),
         .i_wdata(store_data),
-        .i_bmask(4'b1111),               // full word write
+        .i_bmask(4'b1111),
         .i_wren(mem_wren),
         .o_rdata(mem_rdata)
     );
 
-    // === Input buffer: đọc từ Switch và Button ===
+    // === Input buffer: SW + BTN ===
     input_buffer in_buf (
         .i_clk(i_clk),
-        .i_rst_n(~i_reset),
+        .i_rst_n(i_rst_n),
         .addr_i(offset_addr),
         .io_sw_i(i_io_sw),
         .io_btn_i(i_io_btn),
         .o_ld_data(inbuf_data)
     );
 
-    // === Output buffer: ghi dữ liệu tới LED, HEX, LCD ===
+    // === Output buffer: LED + HEX + LCD ===
     output_buffer out_buf (
         .i_clk(i_clk),
-        .i_rst_n(~i_reset),
+        .i_rst_n(i_rst_n),
         .i_addr(offset_addr),
         .i_wr_data(store_data),
         .i_wr_en(outbuf_wren),
