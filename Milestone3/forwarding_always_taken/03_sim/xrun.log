@@ -1,0 +1,134 @@
+xrun(64): 24.09-s005: (c) Copyright 1995-2025 Cadence Design Systems, Inc.
+TOOL:	xrun(64)	24.09-s005: Started on Dec 21, 2025 at 01:40:29 +07
+xrun
+	-access +rwc
+	-f ./flist.f
+		-sv
+		-timescale 1ns/100ps
+		./../00_src/alu.sv
+		./../00_src/brc.sv
+		./../00_src/ctrlu.sv
+		./../00_src/data_memory.sv
+		./../00_src/ex_mem_reg.sv
+		./../00_src/full_adder_1b.sv
+		./../00_src/full_adder_32b.sv
+		./../00_src/fwdu.sv
+		./../00_src/hazard_detection.sv
+		./../00_src/id_ex_reg.sv
+		./../00_src/if_id_reg.sv
+		./../00_src/imm_gen.sv
+		./../00_src/input_buffer.sv
+		./../00_src/instr_memory.sv
+		./../00_src/less_check.sv
+		./../00_src/lsu.sv
+		./../00_src/mem_wb_reg.sv
+		./../00_src/mux2_32b.sv
+		./../00_src/mux3_32b.sv
+		./../00_src/output_buffer.sv
+		./../00_src/pc_reg.sv
+		./../00_src/pipelined_pkg.sv
+		./../00_src/pipelined.sv
+		./../00_src/regfile.sv
+		./../00_src/sll_32b.sv
+		./../00_src/sra_32b.sv
+		./../00_src/srl_32b.sv
+		./../01_bench/driver.sv
+		./../01_bench/scoreboard.sv
+		./../01_bench/tbench.sv
+		./../01_bench/tlib.svh
+Recompiling... reason: file '../00_src/pipelined.sv' is newer than expected.
+	expected: Sun Dec 21 01:34:12 2025
+	actual:   Sun Dec 21 01:39:51 2025
+file: ./../00_src/pipelined.sv
+	module worklib.pipelined:sv
+		errors: 0, warnings: 0
+		Caching library 'worklib' ....... Done
+	Elaborating the design hierarchy:
+	Top level design units:
+		$unit_0x5d12d54a
+		pipelined_pkg
+		tbench
+	Building instance overlay tables: .................... Done
+	Generating native compiled code:
+		worklib.pipelined:sv <0x4a914e8a>
+			streams: 217, words: 56885
+	Building instance specific data structures.
+	Loading native compiled code:     .................... Done
+	Design hierarchy summary:
+		                   Instances  Unique
+		Modules:                 131      29
+		Verilog packages:          1       1
+		Registers:               535     331
+		Scalar wires:            637       -
+		Expanded wires:          256       8
+		Vectored wires:          353       -
+		Always blocks:           129      32
+		Initial blocks:            8       8
+		Cont. assignments:        55      68
+		Pseudo assignments:      461       -
+		Compilation units:         1       1
+		Process Clocks:           11       2
+		Simulation timescale:  100ps
+	Writing initial simulation snapshot: worklib.tbench:sv
+Loading snapshot worklib.tbench:sv .................... Done
+xcelium> source /home/yellow/ctmt_l01_l02_22/tools/eda/cadence/XCELIUM2409/tools/xcelium/files/xmsimrc
+xcelium> run
+
+PIPELINE - ISA tests
+
+add......PASS
+addi.....PASS
+sub......PASS
+and......PASS
+andi.....PASS
+or.......PASS
+ori......PASS
+xor......PASS
+xori.....PASS
+slt......PASS
+slti.....PASS
+sltu.....PASS
+sltiu....PASS
+sll......PASS
+slli.....PASS
+srl......PASS
+srli.....PASS
+sra......PASS
+srai.....PASS
+lw.......PASS
+lh.......PASS
+lhu......PASS
+lb.......PASS
+lbu......PASS
+sw.......PASS
+sh.......PASS
+sb.......PASS
+auipc....PASS
+lui......PASS
+beq......PASS
+bne......PASS
+blt......PASS
+bltu.....PASS
+bge......PASS
+bgeu.....PASS
+jal......PASS
+jalr.....PASS
+malgn....PASS
+iosw.....PASS
+
+=================== Result ===================
+Total Clock Cycles Executed = 8113
+Total Instructions Executed = 4825
+Total Branch Instructions   = 1602
+Total Branch Mispredictions = 0
+
+----------------------------------------------
+Instruction Per Cycle (IPC) = 0.59
+Branch Misprediction Rate   = 0.00 %
+
+END of ISA tests
+
+Simulation complete via $finish(1) at time 32504 NS + 1
+../01_bench/scoreboard.sv:85         $finish;
+xcelium> exit
+TOOL:	xrun(64)	24.09-s005: Exiting on Dec 21, 2025 at 01:40:31 +07  (total: 00:00:02)
